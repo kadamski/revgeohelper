@@ -128,7 +128,7 @@
         map.on('locationfound', onLocationFound);
         map.on('locationerror', onLocationError);
 
-        map.locate({maxZoom: 13, watch: true});
+        map.locate({maxZoom: 13, watch: true, enableHighAccuracy: true});
 
         initialize();
     </script>

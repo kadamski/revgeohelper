@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Reverse geocaching helper</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="widht=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <link rel="stylesheet" href="leaflet/leaflet.css" />
+    <link rel="stylesheet" href="css/my.css" />
+</head>
+
+<body>
+    <div id="map"></div>
+    <script src="leaflet/leaflet.js"></script>
+    <script>
+        var map = L.map('map');
+        var popup = L.popup();
+
+        L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+            maxZoom: 18,
+            attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
+                '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+                'Imagery © <a href="http://mapbox.com">Mapbox</a>',
+            id: 'kadamski.fdf4f254',
+            accessToken: 'pk.eyJ1Ijoia2FkYW1za2kiLCJhIjoiZDVhNjc1NTMyMzJlOGE1ZWI1MTgxNmE1NzgxNTJjMDgifQ.UpK8P0rxyMBnRXySUVLDDA'
+        }).addTo(map);
+
+        var currentMarker = null;
+
+        function onLocationFound(e) {
+            if (currentMarker) {
+                map.removeLayer(currentMarker);
+            } else {
+                map.setView(e.latlng);
+                map.setZoom(17);
+            }
+            currentMarker = L.marker(e.latlng).addTo(map).bindPopup("You are here");
+        }
+
+        function onLocationError(e) {
+            alert(e.message);
+        }
+
+        function onMarkerClick(e) {
+            if (e.target.circle == undefined) {
+                return;
+            }
+
+            var distance = prompt("Distance in meters", e.target.circle._mRadius);
+            if (distance == null) {
+                return;
+            }
+            if (distance == 0) {
+                map.removeLayer(e.target.circle);
+                map.removeLayer(e.target);
+            } else {
+                e.target.circle.setRadius(distance);
+            }
+        }
+
+        function onMapClick(e) {
+            var distance = prompt("Distance in meters");
+            if (distance == null) {
+                return;
+            }
+            var o = L.marker(e.latlng).addTo(map).on('click', onMarkerClick);
+            var c = L.circle(e.latlng, distance).addTo(map);
+            o.circle = c;
+        }
+
+        map.on('click', onMapClick);
+        map.on('locationfound', onLocationFound);
+        map.on('locationerror', onLocationError);
+
+        map.locate({maxZoom: 13, watch: true});
+    </script>
+</body>
+
+</html>

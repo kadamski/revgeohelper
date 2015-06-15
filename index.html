@@ -42,7 +42,7 @@
                 map.setView(e.latlng);
                 map.setZoom(17);
             }
-            currentMarker = L.marker(e.latlng, {icon: redIcon}).addTo(map).bindPopup("You are here");
+            currentMarker = L.marker(e.latlng, {icon: redIcon}).addTo(map);
         }
 
         function onLocationError(e) {

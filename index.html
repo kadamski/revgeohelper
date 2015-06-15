@@ -63,6 +63,10 @@
         }
 
         function addMarker(latlng, distance) {
+            if (distance == 0) {
+                return;
+            }
+
             var o = L.marker(latlng).addTo(map).on('click', onMarkerClick);
             var c = L.circle(latlng, distance).addTo(map);
             o.circle = c;

@@ -15,6 +15,14 @@
         var map = L.map('map');
         var popup = L.popup();
 
+        //Extend the Default marker class
+        var RedIcon = L.Icon.Default.extend({
+            options: {
+                iconUrl: 'icons/marker-icon-red.png'
+            }
+        });
+        var redIcon = new RedIcon();
+
         L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
             maxZoom: 18,
             attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
@@ -33,7 +41,7 @@
                 map.setView(e.latlng);
                 map.setZoom(17);
             }
-            currentMarker = L.marker(e.latlng).addTo(map).bindPopup("You are here");
+            currentMarker = L.marker(e.latlng, {icon: redIcon}).addTo(map).bindPopup("You are here");
         }
 
         function onLocationError(e) {

@@ -49,6 +49,41 @@
             alert(e.message);
         }
 
+        function generateCookie(latlng, distance) {
+            var cn = ""+latlng.lat+latlng.lng;
+            Cookies.set(cn, latlng.lat+";"+latlng.lng+";"+distance, { expires: 365 });
+            return cn;
+        }
+
+        function parseCookie(cookie) {
+            if (cookie == null) {
+                return null;
+            }
+            return cookie.split(";");
+        }
+
+        function addMarker(latlng, distance) {
+            var o = L.marker(latlng).addTo(map).on('click', onMarkerClick);
+            var c = L.circle(latlng, distance).addTo(map);
+            o.circle = c;
+            o.cookie = generateCookie(latlng, distance);
+        }
+
+        function removeMarker(obj) {
+            map.removeLayer(obj.circle);
+            map.removeLayer(obj);
+            Cookies.remove(obj.cookie);
+        }
+
+        function updateMarker(obj, distance) {
+            var c = parseCookie(Cookies.get(obj.cookie));
+            if (c) {
+                Cookies.remove(obj.cookie);
+                obj.cookie = generateCookie(L.latLng(c[0], c[1]), distance);
+            }
+            obj.circle.setRadius(distance);
+        }
+
         function onMarkerClick(e) {
             if (e.target.circle == undefined) {
                 return;
@@ -59,10 +94,9 @@
                 return;
             }
             if (distance == 0) {
-                map.removeLayer(e.target.circle);
-                map.removeLayer(e.target);
+                removeMarker(e.target);
             } else {
-                e.target.circle.setRadius(distance);
+                updateMarker(e.target, distance);
             }
         }
 
@@ -71,9 +105,21 @@
             if (distance == null) {
                 return;
             }
-            var o = L.marker(e.latlng).addTo(map).on('click', onMarkerClick);
-            var c = L.circle(e.latlng, distance).addTo(map);
-            o.circle = c;
+
+            addMarker(e.latlng, distance);
+        }
+
+        function initialize() {
+            for (cn in Cookies.get()) {
+                c = parseCookie(Cookies.get(cn));
+                console.log(c);
+                if (isNaN(c[0]) || isNaN(c[1]) || isNaN(c[2], 10)) {
+                    console.log("remove");
+                    Cookies.remove(cn);
+                } else {
+                    addMarker(L.latLng(c[0], c[1]), c[2]);
+                }
+            }
         }
 
         map.on('click', onMapClick);
@@ -81,6 +127,8 @@
         map.on('locationerror', onLocationError);
 
         map.locate({maxZoom: 13, watch: true});
+
+        initialize();
     </script>
 </body>
 

@@ -51,7 +51,7 @@
 
         function generateCookie(latlng, distance) {
             var cn = ""+latlng.lat+latlng.lng;
-            Cookies.set(cn, latlng.lat+";"+latlng.lng+";"+distance, { expires: 365 });
+            window.localStorage.setItem(cn, latlng.lat+";"+latlng.lng+";"+distance);
             return cn;
         }
 
@@ -72,13 +72,13 @@
         function removeMarker(obj) {
             map.removeLayer(obj.circle);
             map.removeLayer(obj);
-            Cookies.remove(obj.cookie);
+            window.localStorage.removeItem(obj.cookie);
         }
 
         function updateMarker(obj, distance) {
-            var c = parseCookie(Cookies.get(obj.cookie));
+            var c = parseCookie(window.localStorage.getItem(obj.cookie));
             if (c) {
-                Cookies.remove(obj.cookie);
+                window.localStorage.removeItem(obj.cookie);
                 obj.cookie = generateCookie(L.latLng(c[0], c[1]), distance);
             }
             obj.circle.setRadius(distance);
@@ -110,12 +110,14 @@
         }
 
         function initialize() {
-            for (cn in Cookies.get()) {
-                c = parseCookie(Cookies.get(cn));
+            for (i = 0; i < window.localStorage.length; i++) {
+                cn = window.localStorage.key(i);
+                console.log(cn);
+                c = parseCookie(window.localStorage.getItem(cn));
                 console.log(c);
                 if (isNaN(c[0]) || isNaN(c[1]) || isNaN(c[2], 10)) {
                     console.log("remove");
-                    Cookies.remove(cn);
+                    window.localStorage.removeItem(cn);
                 } else {
                     addMarker(L.latLng(c[0], c[1]), c[2]);
                 }

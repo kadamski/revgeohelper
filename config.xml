@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<widget xmlns = "http://www.w3.org/ns/widgets"
+        xmlns:gap   = "http://phonegap.com/ns/1.0"
+        id          = "eu.japko.revgeohelper"
+        version     = "1.0.1"
+        versionCode = "101" >
+
+    <name>RevGeoHelper</name>
+
+    <description></description>
+
+    <author href="k@japko.eu">
+        Krzysztof Adamski
+    </author>
+
+    <content src="index.html" />
+    <access origin="*" />
+
+    <preference name="KeepRunning" value="false"/>
+
+    <gap:plugin name="org.apache.cordova.geolocation" />
+
+    <preference name="permissions" value="none"/>
+    <feature name="http://api.phonegap.com/1.0/geolocation"/>
+
+</widget>

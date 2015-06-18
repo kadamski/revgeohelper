@@ -26,6 +26,10 @@ function onLocationFound(e) {
     } else {
         map.setView(e.latlng);
         map.setZoom(17);
+        var map_el = $('#map_content');
+        var footer = $('#footer');
+        map_el.height(map_el.height() - footer.height() - 3);
+        map.invalidateSize();
     }
     currentMarker = L.marker(e.latlng, {icon: redIcon}).addTo(map);
 }
@@ -78,24 +82,53 @@ function onMarkerClick(e) {
         return;
     }
 
-    var distance = prompt("Distance in meters", e.target.circle._mRadius);
-    if (distance == null) {
-        return;
-    }
-    if (distance == 0) {
-        removeMarker(e.target);
-    } else {
-        updateMarker(e.target, distance);
-    }
+    $("#point_popup_lat").val(e.latlng.lat);
+    $("#point_popup_lng").val(e.latlng.lng);
+    $("#point_popup_distance").val(e.target.circle._mRadius);
+    $("#point_popup").get(0)._target = e.target;
+
+    $("#point_popup").popup("open", "");
 }
 
 function onMapClick(e) {
-    var distance = prompt("Distance in meters");
-    if (distance == null) {
-        return;
-    }
+    $("#point_popup_lat").val(e.latlng.lat);
+    $("#point_popup_lng").val(e.latlng.lng);
+    $("#point_popup_distance").val("");
+    $("#point_popup").get(0)._target = null;
+    $("#point_popup").popup("open", "");
+}
 
-    addMarker(e.latlng, distance);
+function popup_click() {
+    var distance = $("#point_popup_distance").val();
+    var lat = $("#point_popup_lat").val();
+    var lng = $("#point_popup_lng").val();
+    var target = $("#point_popup").get(0)._target;
+
+    if (target == null && distance != 0) {
+        addMarker(L.latLng(lat, lng), distance);
+    } else if (target) {
+        if (distance == 0) {
+            removeMarker(target);
+        } else {
+            updateMarker(target, distance);
+        }
+    }
+    $("#point_popup").popup("close", "");
+}
+
+function set_buttons() {
+    $("#point_popup").get(0)._target = null;
+
+    $("#point_popup_cancel").click(function() {
+        $("#point_popup").popup("close", "");
+    });
+
+    $("#point_popup_ok").click(popup_click);
+    $("#point_popup_form").submit(function(e) {
+        e.preventDefault();
+        popup_click();
+        return false;
+    });
 }
 
 function initialize() {
@@ -111,6 +144,8 @@ function initialize() {
             addMarker(L.latLng(c[0], c[1]), c[2]);
         }
     }
+
+    set_buttons();
 }
 
 map.on('click', onMapClick);

@@ -20,6 +20,14 @@
         <div data-role="footer" id="footer" data-theme="b">
             <a id="clear" href="#">clear</a>
         </div>
+        <div id="point_popup" data-role="popup">
+            <form id="point_popup_form">
+                <input id="point_popup_distance" type="text" name="range">
+                <input id="point_popup_lat" type="hidden" name="lat" />
+                <input id="point_popup_lng" type="hidden" name="lng" />
+                <input id="point_popup_ok" type="submit" value="OK" />
+                <input id="point_popup_cancel" type="button" value="Cancel" />
+        </div>
     </div>
     <script src="3rdparty/js-cookie/src/js.cookie.js"></script>
     <script src="3rdparty/leaflet/leaflet.js"></script>

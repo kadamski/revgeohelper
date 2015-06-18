@@ -1,4 +1,5 @@
 var COLORS = ['blue', 'red', 'yellow', 'black', 'green', 'orange', 'violet', 'brown', 'grey', 'navy', 'darkred', 'pink'];
+var color_stats = {};
 var LABELS = {};
 
 var map = L.map('map');
@@ -59,25 +60,18 @@ function put_color(label) {
         return;
     }
 
+    color_stats[LABELS[label].color] = LABELS[label].cnt;
+
     if (LABELS[label].cnt-- <= 1) {
         delete(LABELS[label]);
     }
+
 }
 
 function next_avail_color() {
     for (var i = 0; i < COLORS.length; i++) {
         var c = COLORS[i];
-        var found = 0;
-
-        for (ll in LABELS) {
-            var l = LABELS[ll];
-            if (l['color'] == c) {
-                found = 1;
-                break;
-            }
-        }
-
-        if (found == 0) {
+        if (color_stats[c] == undefined || color_stats[c] == 0) {
             return i;
         }
     }
@@ -91,6 +85,7 @@ function get_color(label) {
         if (index != null) {
             console.log("Added label " + label + ", color: " + COLORS[index]);
             LABELS[label] = {'color': COLORS[index], 'cnt': 0};
+            color_stats[COLORS[index]] = 0;
         } else {
             console.log("NOT ENOUGH COLORS");
             return null;
@@ -98,6 +93,7 @@ function get_color(label) {
     }
 
     LABELS[label].cnt++;
+    color_stats[LABELS[label].color] = LABELS[label].cnt;
 
     return LABELS[label].color;
 }

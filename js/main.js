@@ -123,7 +123,6 @@ function set_buttons() {
         $("#point_popup").popup("close", "");
     });
 
-    $("#point_popup_ok").click(popup_click);
     $("#point_popup_form").submit(function(e) {
         e.preventDefault();
         popup_click();
@@ -134,7 +133,6 @@ function set_buttons() {
 function initialize() {
     for (i = 0; i < window.localStorage.length; i++) {
         cn = window.localStorage.key(i);
-        console.log(cn);
         c = parseCookie(window.localStorage.getItem(cn));
         console.log(c);
         if (isNaN(c[0]) || isNaN(c[1]) || isNaN(c[2], 10)) {

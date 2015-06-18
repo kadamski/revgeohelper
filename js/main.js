@@ -65,7 +65,7 @@ function put_color(label) {
 }
 
 function next_avail_color() {
-    for (i = 0; i < COLORS.length; i++) {
+    for (var i = 0; i < COLORS.length; i++) {
         var c = COLORS[i];
         var found = 0;
 
@@ -132,6 +132,7 @@ function updateMarker(obj, distance, label) {
     }
     obj.circle.setRadius(distance);
     obj.circle.setStyle({color: get_color(label)});
+    obj.circle._label = label;
 }
 
 function onMarkerClick(e) {
@@ -191,7 +192,7 @@ function set_buttons() {
 }
 
 function initialize() {
-    for (i = 0; i < window.localStorage.length; i++) {
+    for (var i = 0; i < window.localStorage.length; i++) {
         cn = window.localStorage.key(i);
         c = parseCookie(window.localStorage.getItem(cn));
         console.log(c);

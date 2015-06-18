@@ -1,3 +1,6 @@
+var COLORS = ['blue', 'red', 'yellow', 'black', 'green', 'orange', 'violet', 'brown', 'grey', 'navy', 'darkred', 'pink'];
+var LABELS = {};
+
 var map = L.map('map');
 var popup = L.popup();
 
@@ -38,9 +41,9 @@ function onLocationError(e) {
     alert(e.message);
 }
 
-function generateCookie(latlng, distance) {
+function generateCookie(latlng, distance, label) {
     var cn = ""+latlng.lat+latlng.lng;
-    window.localStorage.setItem(cn, latlng.lat+";"+latlng.lng+";"+distance);
+    window.localStorage.setItem(cn, latlng.lat+";"+latlng.lng+";"+distance+";"+label);
     return cn;
 }
 
@@ -51,30 +54,84 @@ function parseCookie(cookie) {
     return cookie.split(";");
 }
 
-function addMarker(latlng, distance) {
+function put_color(label) {
+    if (LABELS[label] == undefined) {
+        return;
+    }
+
+    if (LABELS[label].cnt-- <= 1) {
+        delete(LABELS[label]);
+    }
+}
+
+function next_avail_color() {
+    for (i = 0; i < COLORS.length; i++) {
+        var c = COLORS[i];
+        var found = 0;
+
+        for (ll in LABELS) {
+            var l = LABELS[ll];
+            if (l['color'] == c) {
+                found = 1;
+                break;
+            }
+        }
+
+        if (found == 0) {
+            return i;
+        }
+    }
+
+    return null;
+}
+
+function get_color(label) {
+    if (LABELS[label] == undefined) {
+        var index = next_avail_color();
+        if (index != null) {
+            console.log("Added label " + label + ", color: " + COLORS[index]);
+            LABELS[label] = {'color': COLORS[index], 'cnt': 0};
+        } else {
+            console.log("NOT ENOUGH COLORS");
+            return null;
+        }
+    }
+
+    LABELS[label].cnt++;
+
+    return LABELS[label].color;
+}
+
+function addMarker(latlng, distance, label) {
+    console.log("Add marker " + label);
     if (distance == 0) {
         return;
     }
 
+    var options = {color: get_color(label)};
+
     var o = L.marker(latlng).addTo(map).on('click', onMarkerClick);
-    var c = L.circle(latlng, distance).addTo(map);
+    var c = L.circle(latlng, distance, options).addTo(map);
+    c._label = label;
     o.circle = c;
-    o.cookie = generateCookie(latlng, distance);
+    o.cookie = generateCookie(latlng, distance, label);
 }
 
 function removeMarker(obj) {
     map.removeLayer(obj.circle);
     map.removeLayer(obj);
+    put_color(obj.circle._label);
     window.localStorage.removeItem(obj.cookie);
 }
 
-function updateMarker(obj, distance) {
+function updateMarker(obj, distance, label) {
     var c = parseCookie(window.localStorage.getItem(obj.cookie));
     if (c) {
         window.localStorage.removeItem(obj.cookie);
-        obj.cookie = generateCookie(L.latLng(c[0], c[1]), distance);
+        obj.cookie = generateCookie(L.latLng(c[0], c[1]), distance, label);
     }
     obj.circle.setRadius(distance);
+    obj.circle.setStyle({color: get_color(label)});
 }
 
 function onMarkerClick(e) {
@@ -85,6 +142,7 @@ function onMarkerClick(e) {
     $("#point_popup_lat").val(e.latlng.lat);
     $("#point_popup_lng").val(e.latlng.lng);
     $("#point_popup_distance").val(e.target.circle._mRadius);
+    $("#point_popup_label").val(e.target.circle._label);
     $("#point_popup").get(0)._target = e.target;
 
     $("#point_popup").popup("open", "");
@@ -94,6 +152,7 @@ function onMapClick(e) {
     $("#point_popup_lat").val(e.latlng.lat);
     $("#point_popup_lng").val(e.latlng.lng);
     $("#point_popup_distance").val("");
+    $("#point_popup_label").val("");
     $("#point_popup").get(0)._target = null;
     $("#point_popup").popup("open", "");
 }
@@ -102,15 +161,16 @@ function popup_click() {
     var distance = $("#point_popup_distance").val();
     var lat = $("#point_popup_lat").val();
     var lng = $("#point_popup_lng").val();
+    var label = $("#point_popup_label").val();
     var target = $("#point_popup").get(0)._target;
 
     if (target == null && distance != 0) {
-        addMarker(L.latLng(lat, lng), distance);
+        addMarker(L.latLng(lat, lng), distance, label);
     } else if (target) {
         if (distance == 0) {
             removeMarker(target);
         } else {
-            updateMarker(target, distance);
+            updateMarker(target, distance, label);
         }
     }
     $("#point_popup").popup("close", "");
@@ -139,7 +199,7 @@ function initialize() {
             console.log("remove");
             window.localStorage.removeItem(cn);
         } else {
-            addMarker(L.latLng(c[0], c[1]), c[2]);
+            addMarker(L.latLng(c[0], c[1]), c[2], c[3]);
         }
     }
 

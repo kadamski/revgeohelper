@@ -4,6 +4,7 @@ var LABELS = {};
 
 var map = L.map('map');
 var popup = L.popup();
+var legend = null;
 
 //Extend the Default marker class
 var RedIcon = L.Icon.Default.extend({
@@ -111,6 +112,7 @@ function addMarker(latlng, distance, label) {
     c._label = label;
     o.circle = c;
     o.cookie = generateCookie(latlng, distance, label);
+    update_legend();
 }
 
 function removeMarker(obj) {
@@ -118,6 +120,7 @@ function removeMarker(obj) {
     map.removeLayer(obj);
     put_color(obj.circle._label);
     window.localStorage.removeItem(obj.cookie);
+    update_legend();
 }
 
 function updateMarker(obj, distance, label) {
@@ -129,6 +132,7 @@ function updateMarker(obj, distance, label) {
     obj.circle.setRadius(distance);
     obj.circle.setStyle({color: get_color(label)});
     obj.circle._label = label;
+    update_legend();
 }
 
 function onMarkerClick(e) {
@@ -189,6 +193,30 @@ function set_buttons() {
     });
 }
 
+function update_legend() {
+    if (legend == null) {
+        legend = L.control({position: 'bottomright'});
+        legend.onAdd = function (map) {
+
+            var div = L.DomUtil.create('div', 'info legend');
+
+            // loop through our density intervals and generate a label with a colored square for each interval
+            for (label in LABELS) {
+            // for (var i = 0; i < LABELS.length; i++) {
+                div.innerHTML +=
+                    '<i style="background:' + LABELS[label].color + '"></i> ' + label + " (" + LABELS[label].cnt + ")<br>";
+            }
+
+            return div;
+        };
+
+        legend.addTo(map);
+    } else {
+        legend.removeFrom(map);
+        legend.addTo(map);
+    }
+}
+
 function initialize() {
     for (var i = 0; i < window.localStorage.length; i++) {
         cn = window.localStorage.key(i);
@@ -203,6 +231,7 @@ function initialize() {
     }
 
     set_buttons();
+    update_legend();
 }
 
 map.on('click', onMapClick);

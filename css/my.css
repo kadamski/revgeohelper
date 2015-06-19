@@ -13,3 +13,8 @@ body {
     margin:0px;
     z-index: -1;
 }
+
+#point_popup_header {
+    text-align: center;
+    font-weight: bold;
+}

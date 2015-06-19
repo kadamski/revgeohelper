@@ -136,6 +136,7 @@ function onMarkerClick(e) {
         return;
     }
 
+    $("#point_popup_header").html("Edit point");
     $("#point_popup_lat").val(e.latlng.lat);
     $("#point_popup_lng").val(e.latlng.lng);
     $("#point_popup_distance").val(e.target.circle._mRadius);
@@ -146,6 +147,7 @@ function onMarkerClick(e) {
 }
 
 function onMapClick(e) {
+    $("#point_popup_header").html("Add point");
     $("#point_popup_lat").val(e.latlng.lat);
     $("#point_popup_lng").val(e.latlng.lng);
     $("#point_popup_distance").val("");

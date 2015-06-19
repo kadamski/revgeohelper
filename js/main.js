@@ -61,7 +61,7 @@ function put_color(label) {
         return;
     }
 
-    color_stats[LABELS[label].color] = LABELS[label].cnt;
+    color_stats[LABELS[label].color] = LABELS[label].cnt-1;
 
     if (LABELS[label].cnt-- <= 1) {
         delete(LABELS[label]);

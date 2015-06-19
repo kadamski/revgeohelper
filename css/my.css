@@ -37,3 +37,7 @@ body {
     margin-right: 8px;
     opacity: 0.7;
 }
+
+.ui-popup {
+    padding: 6px;
+}

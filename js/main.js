@@ -1,6 +1,7 @@
 var COLORS = ['blue', 'red', 'yellow', 'black', 'green', 'orange', 'violet', 'brown', 'grey', 'navy', 'darkred', 'pink'];
 var color_stats = {};
 var LABELS = {};
+var MARKERS = [];
 
 var map = L.map('map');
 var popup = L.popup();
@@ -113,14 +114,19 @@ function addMarker(latlng, distance, label) {
     o.circle = c;
     o.cookie = generateCookie(latlng, distance, label);
     update_legend();
+    MARKERS.push(o);
 }
 
 function removeMarker(obj) {
+    var index = MARKERS.indexOf(obj);
     map.removeLayer(obj.circle);
     map.removeLayer(obj);
     put_color(obj.circle._label);
     window.localStorage.removeItem(obj.cookie);
     update_legend();
+    if (index > -1) {
+        MARKERS.splice(index, 1);
+    }
 }
 
 function updateMarker(obj, distance, label) {
@@ -190,6 +196,13 @@ function set_buttons() {
         e.preventDefault();
         popup_click();
         return false;
+    });
+    $("#clear").click(function(e) {
+        if (confirm("Are you sure you want to clear all markers?")) {
+            for (var i=MARKERS.length-1; i>=0; i--) {
+                removeMarker(MARKERS[i]);
+            }
+        }
     });
 }
 
